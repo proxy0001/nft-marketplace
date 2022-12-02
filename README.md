@@ -75,3 +75,208 @@ Ethereum 開發智能合約的主流語言是 Solidity，Framework 比較多元�
 
 #### 結論
 感覺可以開始了～ 我們這裡會先著重在使用介面跟錢包互動，智能合約放後面一點，先了解概念就好。選擇使用 React、Next.js、Chakra UI、wagmi 開始！
+
+
+### Day 1
+
+今天主要就是學習使用 wagmi 。首先先建立環境吧！
+
+#### 建立環境
+預計把 Next.js 視為標準配備，所以就直接上吧！用 [create-next-app](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) 建立基本環境，包含 TypeScript 跟 ESLint。
+
+```
+npx create-next-app@latest nft-marketplace --typescript --eslint
+```
+
+然後裝 Chakra UI ，我們是基於 Next.js 所以看[官網這篇](https://chakra-ui.com/getting-started/nextjs-guide)。然後 Setup Provider，應該是為了要讓子組件能夠共享許多東西，需要用 ChakraProvider 把將 APP 的 Root 包起來。
+
+```
+npm i @chakra-ui/react @emotion/react@^11 @emotion/styled@^11 framer-motion@^6
+```
+
+```typescript
+// /pages/_app.js
+import { ChakraProvider } from '@chakra-ui/react'
+
+function App({ Component, pageProps }) {
+  return (
+    <ChakraProvider>
+      <Component {...pageProps} />
+    </ChakraProvider>
+  )
+}
+
+export default App
+```
+
+基本上這樣就可以用了，但我們把其他的設置也看一下，應該都滿常用的。
+
+#### Customizing theme
+可以自定義 theme，然後丟入 CHakraProvider 即可。基本要照著他定義的格式設置，超級多。我們對 Color Mode 比較有興趣，試著調整一下初始 Color Mode。首先先建立 ./theme/index.ts 放修改的設置。基本上照著[官網說明](https://chakra-ui.com/docs/styled-system/customize-theme)即可。這邊只先修改初始 Mode 為 dark 。
+```typescript
+// /theme/index.ts
+import { extendTheme, ThemeConfig } from '@chakra-ui/react'
+
+const config: ThemeConfig = {
+  initialColorMode: 'dark',
+}
+
+const theme = extendTheme({ config })
+export default theme
+```
+
+接著要記得把 新的 theme 注入給 ChakraProvider。
+```typescript
+// /pages/_app.js
+// 3. Pass the new theme to `ChakraProvider`
+function App({ Component, pageProps }) {
+  return (
+    <ChakraProvider theme={theme}>
+      <Component {...pageProps} />
+    </ChakraProvider>
+  )
+}
+```
+
+#### [Adding the ColorModeScript](https://chakra-ui.com/docs/styled-system/color-mode#adding-the-colormodescript)
+
+然後要加一個東西，ColorModeScript，主要是為了在 HTML 讀取到 body 之前，就可以抓到儲存在 local storage 的使用者色彩模式偏好紀錄。Next.js 的話要加在 _document.tsx 這裡。這隻初始化的時候不會存在，要修改的話，需要自己新增出來覆蓋掉預設。根據[官網](https://nextjs.org/docs/advanced-features/custom-document)，預設是長這樣：
+```typescript
+// /pages/_document.tsx
+import { Html, Head, Main, NextScript } from 'next/document'
+
+export default function Document() {
+  return (
+    <Html>
+      <Head />
+      <body>
+        <Main />
+        <NextScript />
+      </body>
+    </Html>
+  )
+}
+```
+根據[chakra 的說明](https://chakra-ui.com/docs/styled-system/color-mode#for-nextjs)我們調整成這樣：
+```typescript
+// pages/_document.js
+import { ColorModeScript } from '@chakra-ui/react'
+import NextDocument, { Html, Head, Main, NextScript } from 'next/document'
+import theme from './theme'
+
+export default class Document extends NextDocument {
+  render() {
+    return (
+      <Html lang='en'>
+        <Head />
+        <body>
+          {/* 👇 Here's the script */}
+          <ColorModeScript initialColorMode={theme.config.initialColorMode} />
+          <Main />
+          <NextScript />
+        </body>
+      </Html>
+    )
+  }
+}
+```
+
+但是這有個很奇怪的地方，Next.js 是 Server Side Render ...，在 Server 上產 HTML 的時侯，沒辦法拿到 Client 的 local storage 才對。也就是說，實際上這在 Nuxt.js 上應該沒屁用，如果會動，應該還是先產生 body 再改變 theme 的感覺，視覺上會閃一下。解決方法要看他官網這裡的[說明](https://chakra-ui.com/docs/styled-system/color-mode#add-colormodemanager-optional-for-ssr)，也就是說要用到 Next.js SSR 的模式，當使用者請求 HTML 的時候，將 request 裡的帶的 cookie 塞進去給 ChakraProvider，產出來的樣式就會是使用者的偏好紀錄。然後上面提到的 ColorModeScript，基本上就是無用的，可以刪掉了 🙄
+
+#### [Add colorModeManager (Optional, for SSR)](https://chakra-ui.com/docs/styled-system/color-mode#add-colormodemanager-optional-for-ssr)
+
+我們要新增一隻 /components/Chakra.tsx，會回傳裝飾後的 ChakraProvider，以及自定義一隻給 Next.js 用來執行 SSR 的函式 getServerSideProps 讓頁面使用，詳細看 Next.js 的[官方說明]((https://nextjs.org/docs/basic-features/data-fetching/get-server-side-props))。
+
+第一個部分就是根據有沒有 cookies 改變 ChakraProvider 的狀態，如果有就改用 cookieStorageManager，沒有就用預設的 localStorageManager。然後回傳新的 ChakraProvider 定義。
+
+第二個部分就是定義一隻共用的 getServerSideProps 給其他頁面要執行 SSR 時，會從 request 的 header 裡，拿出 cookie 輸入給 page，到時候會是 Next.js 要渲染 HTML 時調用的。
+
+我們依照官網範例做了一些修改，因為幾個原因:
+1. 範例不是 TypeScript，只好自己翻找 Type 出來定義
+2. 他的範例不太貼心，其他要給 ChakraProvider 的 props 沒有綁在回傳的上面，這樣變成以後要改 ChakraProvider 都要回來這隻身上改，很不直觀。
+
+```typescript
+// /components/Chakra.tsx
+import type { GetServerSidePropsContext } from 'next'
+import {
+  ChakraProvider,
+  cookieStorageManagerSSR,
+  localStorageManager,
+  ChakraProviderProps,
+  ColorModeProviderProps,
+} from '@chakra-ui/react'
+
+type ChakraProviderWrap = ChakraProviderProps & { cookies: string | undefined }
+
+export function Chakra({ cookies, children, ...restProps }: ChakraProviderWrap): JSX.Element {
+  // b) Pass `colorModeManager` prop
+  const colorModeManager: ColorModeProviderProps["colorModeManager"] =
+    typeof cookies === 'string'
+      ? cookieStorageManagerSSR(cookies)
+      : localStorageManager
+  return (
+    <ChakraProvider colorModeManager={colorModeManager} {...restProps}>
+      {children}
+    </ChakraProvider>
+  )
+}
+
+// also export a reusable function getServerSideProps
+export function getServerSideProps({ req }: GetServerSidePropsContext) {
+  return {
+    props: {
+      // first time users will not have any cookies and you may not return
+      // undefined here, hence ?? is necessary
+      cookies: req.headers.cookie ?? '',
+    },
+  }
+}
+```
+
+然後去 _app.tsx 將原本的 ChakraProvider 改成我們剛剛做的那隻
+```typescript
+// setup your wrapper in the _app file (e.g: pages/_app.js)
+import { Chakra } from "../components/Chakra";
+import type { AppProps } from 'next/app'
+import theme from '../theme'
+
+export default function App({ Component, pageProps }: AppProps) {
+  return <Chakra cookies={pageProps.cookies} theme={theme}>
+    <Component {...pageProps} />
+  </Chakra>
+}
+```
+
+以及去到頁面上，設定 Next.js 觸發 SSR 機制，設定方式是在最底下 export 一隻 getServerSideProps，這邊就是 export 我們剛剛寫的共用的那隻。
+```typescript
+// re-export the reusable `getServerSideProps` function
+export { getServerSideProps } from "../components/Chakra"
+```
+
+然後可以把 _document.tsx 我們剛剛加的 ColorModeScript 刪掉了 🙄，實際上可以砍掉 _document.tsx 整隻了 🙄
+
+最後去 index.tsx 上面改頁面內容，新增一個可以切換 Color Mode 的按鈕，試試效果。
+```jsx
+export default function Home() {
+  const { colorMode, toggleColorMode } = useColorMode()
+  return (
+    <div>
+          <Button onClick={toggleColorMode} variant='ghost'>
+            {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
+          </Button>
+    </div>
+  )
+}
+```
+
+要看成功與否可以 console.log cookie 出來看看有沒有接到，畫面上的效果比較不明顯，但是是看得出來的。如果把 index.tsx 的 export getServerSideProps 關掉，就會變成預設的模式，這個時候畫面上轉換 theme 的時候，會有一瞬間閃動，原因就是 Theme 的改動實際上是在拿到 HTML 的 body 之後才產生作用的，因為 Next.js 一開始產的 HTML 並不知道現在使用者的預設 Color Mode 改變了。但要注意 SSR 的開銷還是比較大的，這部分的衡量就看狀況而異吧。原理可以看看[這篇](https://ithelp.ithome.com.tw/articles/10266781)
+
+### was
+
+照著 [wagmi](https://wagmi.sh/) 官網安裝 wagmi 跟 ethers。
+```
+npm i wagmi ethers
+```
+
+#### 小結
+就這樣，結果今天就搞這個而已 ...，原本是要花時間在 wagmi 上的，結果都在搞 Chakra UI + Next.js。 Chakra UI 的那個說明跟範例怎麼看怎麼不順，害得我一股腦想搞懂它到底在幹嘛，也就順手了解了一點 Next.js 的機制。明天要專心在 wagmi 上了！
