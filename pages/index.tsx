@@ -29,3 +29,6 @@ export default function Home() {
     </div>
   )
 }
+
+// re-export the reusable `getServerSideProps` function
+export { getServerSideProps } from "../components/Chakra"
