@@ -2,6 +2,8 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { useColorMode, Flex, Box, Spacer, Heading, Button, Center } from '@chakra-ui/react'
 import { MoonIcon, SunIcon } from '@chakra-ui/icons'
+import Profile from '../components/Profile'
+import Wagmi from '../wagmi'
 
 export default function Home() {
   const { colorMode, toggleColorMode } = useColorMode()
@@ -21,7 +23,10 @@ export default function Home() {
           <Spacer />
           <Button onClick={toggleColorMode} variant='ghost'>
             {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
-          </Button>  
+          </Button>
+          <Wagmi>
+            <Profile/>
+          </Wagmi>
         </Flex>
       </header>
       <main>
