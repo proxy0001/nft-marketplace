@@ -1,23 +1,67 @@
 import { useState, useEffect } from 'react'
-import { useAccount, useConnect, useDisconnect } from 'wagmi'
-import { InjectedConnector } from 'wagmi/connectors/injected'
-import { Button } from '@chakra-ui/react'
+import { useAccount, useConnect, useDisconnect, useEnsAvatar, useEnsName, Connector } from 'wagmi'
+import { OnClick } from '../@types/app'
+import { Button, Flex } from '@chakra-ui/react'
+import { Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react'
+import NoSSR from './NoSSR'
+import { Avatar, Text } from '@chakra-ui/react'
+import { ChevronDownIcon } from '@chakra-ui/icons'
+
 export default function Profile() {
-  const [isDefinitelyConnected, setIsDefinitelyConnected] = useState(false)
-  const { address, isConnected } = useAccount()
-  const { connect } = useConnect({
-    connector: new InjectedConnector(),
-  })
+  const { connect, connectors, error, isLoading, pendingConnector } = useConnect()
   const { disconnect } = useDisconnect()
 
-  useEffect(() => setIsDefinitelyConnected(isConnected), [address, isConnected])
+  const { address, connector, isConnected } = useAccount()
+  const { data: ensAvatar } = useEnsAvatar({ address, chainId: 1, })
+  const { data: ensName } = useEnsName({ address })
+  const [name, setName] = useState(ensName || (address as String)?.slice(2) || '')
+  
+  useEffect(() => {
+    setName(ensName || (address as String)?.slice(2) || '')
+  }, [ensName, address])
+  
+  const onConnect: (connector: Connector) => OnClick = (connector) => event => connect({ connector })
+  const onDisconnect: OnClick = event => disconnect()
 
-  if (isDefinitelyConnected)
-    return (
-      <div>
-        Connected to {address}
-        <Button variant='ghost' onClick={() => disconnect()}>Disconnect</Button>
-      </div>
-    )
-  return <Button variant='ghost' onClick={() => connect()}>Connect Wallet</Button>
+  const getInitials = (n: string) => n.length > 2 ? n.slice(0, 2) : n
+  const displayAddress = (address: string): string => address && address.length > 4 ? `${address?.slice(0, 4)}...${address?.slice(-4)}` : address
+
+  if (isConnected) return (
+    <NoSSR>
+      <Menu>
+        <MenuButton as={Button} variant='ghost'>
+          <Flex alignItems="center">
+            <Text mr={2}>{displayAddress(address as string)}</Text>
+            <Avatar getInitials={getInitials} size='sm' name={name} src={ensAvatar ? ensAvatar : ''}/>
+          </Flex>
+        </MenuButton>
+        <MenuList>
+          <MenuItem onClick={onDisconnect}>Disconnect</MenuItem>
+        </MenuList>
+      </Menu>
+    </NoSSR>
+  )
+
+  return (
+    <NoSSR>
+      <Menu>
+        <MenuButton variant='ghost' as={Button} rightIcon={<ChevronDownIcon />}>
+          Connect
+        </MenuButton>
+        <MenuList>
+          {connectors.map((conn) => (
+            <MenuItem
+              disabled={!conn.ready}
+              key={conn.id}
+              onClick={onConnect(conn)}
+            >
+              {conn.name}
+              {!conn.ready && ' (unsupported)'}
+              {isLoading && conn.id === pendingConnector?.id && ' (connecting)'}
+            </MenuItem>
+          ))}
+        </MenuList>
+      </Menu>
+    </NoSSR>
+  )
 }

@@ -16,11 +16,9 @@ export default function Home() {
       </Head>
 
       <header>
-        <Flex>
-          <Box p='2'>
-            <Heading size='md'>NFT Marketplace</Heading>
-          </Box>
-          <Spacer />
+        <Flex alignItems="center" p={2}>
+          <Heading p={2} size='md'>NFT Marketplace</Heading>
+          <Spacer />  
           <Button onClick={toggleColorMode} variant='ghost'>
             {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
           </Button>
