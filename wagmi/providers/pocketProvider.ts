@@ -33,7 +33,6 @@ export function pocketProvider({
   // providers.PocketWebSocketProvider
 > {
   return function (chain) {
-    console.log(chain, pocketRpcUrls[chain.network as PocketNetworks])
     const pocketRpcUrl = pocketRpcUrls[chain.network as PocketNetworks]
     if (!pocketRpcUrl) return null
     return {

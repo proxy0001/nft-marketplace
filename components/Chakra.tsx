@@ -11,7 +11,6 @@ type ChakraProviderWrap = ChakraProviderProps & { cookies: string | undefined }
 
 export function Chakra({ cookies, children, ...restProps }: ChakraProviderWrap): JSX.Element {
   // b) Pass `colorModeManager` prop
-  console.log(cookies)
   const colorModeManager: ColorModeProviderProps["colorModeManager"] =
     typeof cookies === 'string'
       ? cookieStorageManagerSSR(cookies)
