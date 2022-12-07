@@ -1,7 +1,7 @@
 # NFT Marketplace
 This is our first DApp, Learning how to build a DApp by doing a small project that connects your wallet and show your NFTs.
 
-[Online Demo](https://nft-marketplace-1.vercel.app/)
+[Online Demo](https://nft-marketplace-1-one.vercel.app/)
 
 ## 寫在最前面
 
@@ -29,6 +29,12 @@ This is our first DApp, Learning how to build a DApp by doing a small project th
 - 進頁面會閃一下，還不知道如何處理
 - 更多的資訊還沒取得跟呈現
 
+核心的幾隻檔案
+- hooks/useNfts/useNft.ts // 取得NFTs 的主要核心
+- queries/etherscan.tx // 用 react-query 包裝 fetch API
+- modals/db.ts // 緩存的 indexedDB
+- reducers/status.ts // 原本打算用它處理各式狀態變化，但還沒用上
+
 ## Week 1 小結
 感覺一口氣接觸太多不熟悉的東西，有點腦死，然後還生病。抓資料使用 opensea-js 會簡單很多，整個專案在第一週的目標完成度也會比較高。選擇下面這個流程來獲取使用者擁有的 NFTs，就目標達成來說，非常不好，但就學習上來說，真的是收穫滿滿。
 
@@ -40,9 +46,10 @@ This is our first DApp, Learning how to build a DApp by doing a small project th
 
 以下是除了腦死以外的收穫
 - 第一次做 Dapp
-- 第一次使用 wagmi
+- 第一次使用 wagmi 登陸錢包跟操作合約
 - 第一次使用 Chakra-UI
 - 第一次使用 Dexie & indexedDB
+- 第一次使用 react-query
 - 第一次大量使用 React Hooks 的方式解決問題
 - 學習 React 第二週，對 React Hooks + async 熟悉很多
 - 踩了更多的 Next.js + 其他東西的坑
