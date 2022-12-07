@@ -1,14 +1,18 @@
 import Head from 'next/head'
 import Image from 'next/image'
-import { useColorMode, Flex, Box, Spacer, Heading, Button, Center } from '@chakra-ui/react'
+import { Image as ChakraImage, useColorMode, Flex, Box, Spacer, Heading, Button, Card, CardBody, Text, Divider, CardFooter, SimpleGrid, Img } from '@chakra-ui/react'
 import { MoonIcon, SunIcon } from '@chakra-ui/icons'
 import Profile from '../components/Profile'
-import Wagmi from '../wagmi'
+import { useAccount } from 'wagmi'
+import { Fragment } from 'react'
+import { useNft } from '../hooks/useNft'
 
 export default function Home() {
   const { colorMode, toggleColorMode } = useColorMode()
+  const { address } = useAccount()
+  const { nfts, ...status } = useNft(address as string)
   return (
-    <div>
+    <Fragment>
       <Head>
         <title>NFT Marketplace</title>
         <meta name="description" content="" />
@@ -17,19 +21,46 @@ export default function Home() {
 
       <header>
         <Flex alignItems="center" p={2}>
-          <Heading p={2} size='md'>NFT Marketplace</Heading>
+          <Heading p={2} size='md' as='s'>NFT Marketplace</Heading>
           <Spacer />  
           <Button onClick={toggleColorMode} variant='ghost'>
             {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
           </Button>
-          <Wagmi>
-            <Profile/>
-          </Wagmi>
+          <Profile/>
         </Flex>
       </header>
       <main>
+        <Heading size='lg' pl={6}>Your NFT Assets</Heading>
+        <SimpleGrid p={6} minChildWidth={240} spacing={6}>
+          {nfts.map((nft, idx) => {
+            return (
+              <Card key={`${nft.contractAddress}${nft.tokenId}${idx}`} maxW='sm'>
+                <CardBody>
+                  <Box position="relative" width="100%" height="240">
+                    <Image
+                      fill
+                      layout='fill'
+                      objectFit='contain'
+                      src={nft.image}
+                      alt={nft.tokenId}
+                      borderRadius='lg'
+                    />
+                  </Box>
+                </CardBody>
+                <Divider />
+                <CardFooter>
+                  <Flex alignItems='center' width="100%" justifyContent='space-between'>
+                    <Text  noOfLines={1} fontSize='md' maxW={24}>{nft.tokenId}</Text>
+                    <Text fontSize='xs'>{nft.type}</Text>
+                  </Flex>
+                </CardFooter>
+              </Card>
+            )
+          })}
+        </SimpleGrid>
+        
       </main>
-    </div>
+    </Fragment>
   )
 }
 
