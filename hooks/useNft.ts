@@ -39,17 +39,6 @@ const extractUniqueTokenObj = (ary: Array<Tx>): Array<TokenObj> => {
   return Array.from(uniqueTokenStrings).map(x => toKenStringToTokenObj(x))
 }
 
-const extractFnResults = <F extends string, R, A>(fnNames: Array<F>, results: Array<R>, extractFn: (acc: A, res: any, groupIdx: number) => A, accurate: A): A => {
-  if (extractFn === undefined) return accurate
-  if (results === undefined || !results.length) return accurate
-  for (let i = 0; i < results.length; i += fnNames.length) {
-    const res = fnNames.reduce((acc, cur, idx) => 
-      ({...acc, [cur]: results[(i + idx) as keyof typeof  results]}), {} as Object)
-    accurate = extractFn(accurate, res, Math.floor(i / fnNames.length))
-  }
-  return accurate
-}
-
 type Ipfs = `ipfs://${string}`
 type Https = `https://${string}`
 type TokenABI = Ipfs | Https | string | null
