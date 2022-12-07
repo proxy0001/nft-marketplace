@@ -9,7 +9,7 @@ This is our first DApp, Learning how to build a DApp by doing a small project th
 - 首先要先連上 metamask 並且切換到 ethereum
 - 然後 refresh 畫面之後，才會開始抓 nft 資料
 - 抓資料會一直抓，還沒測試過大量資料的時候會如何
-- nft 圖片有時候會沒出現，還沒處理，目前先重新整理
+- nft 圖片有時候會沒出現，好像就會一直沒出現了，還沒處理
 - 鍊只有支援 etheruem，其他都會有問題，因為目前只有接 主網的 erc721 資料
 
 做到的
@@ -47,40 +47,6 @@ This is our first DApp, Learning how to build a DApp by doing a small project th
 - 學習 React 第二週，對 React Hooks + async 熟悉很多
 - 踩了更多的 Next.js + 其他東西的坑
 - 對 TypeScript 的泛型多熟悉了一些
-
-## Getting Started
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
 ## 目標
 - 完成一個 DApp，可以連上 MetaMask，展示自己的 NFTs。
@@ -413,3 +379,37 @@ useNFT 這隻的流程：
 
 第六天大致上寫到 step 3，第七天把 step 4 跟整個流程順一次。第七天一直遇到無限 re-render 的問題，最後參考了些資料，用 useMemo 跟 useCallback 處理掉了。用 useQueries 的時候又遇到一次，參考了[這篇](https://github.com/TanStack/query/issues/3049)的解決方法。最後快速簡單的把呈現介面做了一下，跟紀錄。
 
+
+## Getting Started
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+
+First, run the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+
+[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+
+The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
