@@ -6,7 +6,10 @@ This is our first DApp, Learning how to build a DApp by doing a small project th
 ## 寫在最前面
 
 注意!!!
-- 目前一進頁面就會一直去抓 erc721 的交易資料，還沒測試過大量資料的時候會如何
+- 首先要先連上 metamask 並且切換到 ethereum
+- 然後 refresh 畫面之後，才會開始抓 nft 資料
+- 抓資料會一直抓，還沒測試過大量資料的時候會如何
+- nft 圖片有時候會沒出現，還沒處理，目前先重新整理
 - 鍊只有支援 etheruem，其他都會有問題，因為目前只有接 主網的 erc721 資料
 
 做到的
