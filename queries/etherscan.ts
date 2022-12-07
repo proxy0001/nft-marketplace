@@ -40,6 +40,7 @@ export type Tx = {
   confirmations: string
 }
 
+const ETHERSCAN_KEY = process.env.NEXT_PUBLIC_ETHERSCAN_KEY as string
 const offsetN = 100
 
 const fetchErc721Tx: FetchByAddress<Response<Tx>> = async ({url, address, page = 1, startblock = 0}) => {
@@ -51,7 +52,7 @@ const fetchErc721Tx: FetchByAddress<Response<Tx>> = async ({url, address, page =
     startblock: startblock.toString(),
     sort: 'asc',
     offset: offsetN.toString(),
-    apikey: 'SKSVP9NSMVDP2W58BRD73Z9GBHP33WSK4I',
+    apikey: ETHERSCAN_KEY,
   })
   const res = await fetch(url + '/api?' + params)
   const data = await res.json()
