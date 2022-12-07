@@ -41,9 +41,8 @@ export default function Home() {
                       fill
                       layout='fill'
                       objectFit='contain'
-                      src={nft.image}
-                      alt={nft.tokenId}
-                      borderRadius='lg'
+                      src={nft.image ? nft.image : ''}
+                      alt={nft.tokenId ? nft.tokenId : ''}
                     />
                   </Box>
                 </CardBody>
