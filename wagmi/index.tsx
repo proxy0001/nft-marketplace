@@ -11,7 +11,11 @@ import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
  
 
 const { chains, provider, webSocketProvider } = configureChains([
-  chain.mainnet, chain.polygon, avalanche
+  chain.mainnet,
+  chain.polygon,
+  avalanche,
+  chain.goerli,
+  chain.polygonMumbai,
 ], [
   // pocketProvider({
   //   applicationId: process.env.NEXT_PUBLIC_POCKET_APP_ID,
@@ -44,7 +48,7 @@ const connectors = [
 ]
 
 const client = createClient({
-  autoConnect: false,
+  autoConnect: true,
   connectors: connectors,
   provider,
   webSocketProvider,
