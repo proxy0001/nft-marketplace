@@ -1,8 +1,47 @@
 # NFT Marketplace
 This is our first DApp, Learning how to build a DApp by doing a small project that connects your wallet and show your NFTs.
 
-# NFT Marketplace
-Our first DApp, Learning how to build a DApp by doing a small project that connects your wallet and show your NFTs.
+## 寫在最前面
+
+注意!!!
+- 目前一進頁面就會一直去抓 erc721 的交易資料，還沒測試過大量資料的時候會如何
+- 鍊只有支援 etheruem，其他都會有問題，因為目前只有接 主網的 erc721 資料
+
+做到的
+- 可以用錢包登入
+- 可以切換鍊，但功能不齊全，基本只有 Etheruem 使用
+- 會呈現自己錢包裡面有的 NFT，理論上應該會全部都跑出來
+- 只有接 erc721
+- 抓過的資料會緩存在 indexedDB
+- API 都有透過 react-query 緩存
+
+沒做到的
+- 其他錢包沒測試
+- 其他鍊功能不齊全
+- 切換鍊之後，應該有很多 Bugs
+- 沒做分頁、錯誤處理、測試等
+- 還沒接 erc1155
+- 進頁面會閃一下，還不知道如何處理
+- 更多的資訊還沒取得跟呈現
+
+## Week 1 小結
+感覺一口氣接觸太多不熟悉的東西，有點腦死，然後還生病。抓資料使用 opensea-js 會簡單很多，整個專案在第一週的目標完成度也會比較高。選擇下面這個流程來獲取使用者擁有的 NFTs，就目標達成來說，非常不好，但就學習上來說，真的是收穫滿滿。
+
+1. 通過 infiniteQuery 跟 etherscan AIP 獲取當前用戶的所有erc721交易記錄
+2. 從交易記錄中找出已經交易過的 Token 及其合約，將爬取到的區塊鏈號緩存起來。 同一用戶下次會繼續從這裡搜索
+3. 利用 wagmi 的 useContractReads 執行上面的合約，找出 owner 和 TokenURI，並以此過濾出擁有的 NFTs
+4. 根據上面獲取到的 TokenURI，使用 wagmi 的 useQueries 批次獲取 metadata。
+5. 將數據整理緩存到 indexedDB 中，並更新當前用戶擁有的 NFTs。
+
+以下是除了腦死以外的收穫
+- 第一次做 Dapp
+- 第一次使用 wagmi
+- 第一次使用 Chakra-UI
+- 第一次使用 Dexie & indexedDB
+- 第一次大量使用 React Hooks 的方式解決問題
+- 學習 React 第二週，對 React Hooks + async 熟悉很多
+- 踩了更多的 Next.js + 其他東西的坑
+- 對 TypeScript 的泛型多熟悉了一些
 
 ## Getting Started
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
@@ -271,7 +310,7 @@ export default function Home() {
 
 要看成功與否可以 console.log cookie 出來看看有沒有接到，畫面上的效果比較不明顯，但是是看得出來的。如果把 index.tsx 的 export getServerSideProps 關掉，就會變成預設的模式，這個時候畫面上轉換 theme 的時候，會有一瞬間閃動，原因就是 Theme 的改動實際上是在拿到 HTML 的 body 之後才產生作用的，因為 Next.js 一開始產的 HTML 並不知道現在使用者的預設 Color Mode 改變了。但要注意 SSR 的開銷還是比較大的，這部分的衡量就看狀況而異吧。原理可以看看[這篇](https://ithelp.ithome.com.tw/articles/10266781)
 
-### was
+### wagmi
 
 照著 [wagmi](https://wagmi.sh/) 官網安裝 wagmi 跟 ethers。
 ```
@@ -280,3 +319,92 @@ npm i wagmi ethers
 
 #### 小結
 就這樣，結果今天就搞這個而已 ...，原本是要花時間在 wagmi 上的，結果都在搞 Chakra UI + Next.js。 Chakra UI 的那個說明跟範例怎麼看怎麼不順，害得我一股腦想搞懂它到底在幹嘛，也就順手了解了一點 Next.js 的機制。明天要專心在 wagmi 上了！
+
+### Day 2
+今天要專心在 wagmi 的研究上，但先補充一點小東西。
+
+#### [Conventional Commits](https://www.conventionalcommits.org/zh-hant/v1.0.0/)
+前面有提到這次會開始用這個，順便裝了一些工具來幫助我們規範，不然之前的 commit 其實也沒確實遵守。
+[使用 husky + commitlint 規範 Commit Message 格式是否符合要求](https://www.rickjiang.dev/blog/validate-commit-message-using-commitlint-and-husky)，這篇非常的方便，理解容易，複製貼上就可以開始使用了。
+
+```
+# Install commitlint cli and conventional config
+npm install --save-dev @commitlint/config-conventional @commitlint/cli
+
+# Configure commitlint to use conventional config
+echo "module.exports = {extends: ['@commitlint/config-conventional']}" > commitlint.config.js
+
+# Install Husky v6
+npm install husky --save-dev
+
+# Activate hooks
+npx husky install
+
+# Add hook
+npx husky add .husky/commit-msg "npx --no -- commitlint --edit $1"
+```
+
+除此之外這次還一起找到了很多好東西，但這次還不實裝。這個 [Template](https://github.com/sozonome/nextarter-chakra) 很值得研究一下，他也是用 Next.js + Chakra-UI + TypeScript，配置好了許多實用工具如下：
+
+- toolings for linting, formatting, and conventions configured
+  - eslint
+  - prettier
+  - husky
+  - lint-staged
+  - commitlint
+  - commitizen
+  - standard-version
+- PWA-ready
+  - next-pwa
+- SEO optimization configured
+  - next-seo
+  - next-sitemap
+- e2e Test
+  - playwright
+
+另外這篇: [使用ESLint, Prettier, Husky, Lint-staged以及Commitizen提升專案品質及一致性](https://medium.com/@danielhu95/set-up-eslint-pipeline-zh-tw-990d7d9eb68e) 也可以參考。
+
+#### 開始操作錢包
+
+先照著首頁的範例試試看 https://wagmi.sh/，一上來就踩坑了，參考了[這篇](https://ethereum.stackexchange.com/questions/133612/error-hydration-failed-because-the-initial-ui-does-not-match-what-was-rendered)處理。主要都是在看 wagmi 的官網跟原始碼，看一下有哪些東西。
+
+wagmi 針對 Alchemy, Infura 這兩個比較常見的 Provider 有比較完善的支援，剩下的是 public，提供了好幾個公共用的，最後是自定義用的 JSON RPC。出於私心，研究了一下原始碼都是怎麼寫的，想說試試看自己弄一個 Pocket 的 Provider。底層的 ethers.js 有提供 Pocket 的 Provider，想說照著原始碼的方式寫一個，是可以動的，但是後來幾天用起來好像還是有點怪怪的，就先關掉了。
+
+然後嘗試一下 Config Wagmi 以及切換不同的 chain。大致上就完成了 header，可以切換 Chain 跟 使用不同類型的 Connector，但是我們只有試過 Metamask 而已。
+
+### Day 3 & 4
+
+把前幾天寫的 code 整理一下，然後就生病了.........躺了將近兩天
+
+### Day 5
+
+Survey 要怎麼獲取資料。
+- opensea-js
+- etherscan API
+- alchemy SDK
+- ...其他廠商出的
+
+看了半天，比較完整的好像是 opensea-js，但聽說他們的 API key 很難申請？etherscan API 的文檔很清楚，也有不少基本用的，但是我們最需要的這隻[Get Address ERC721 Token Holding ](https://docs.etherscan.io/api-endpoints/tokens#get-address-erc721-token-holding) 要 Pro 才可以使用。然後其他的廠商出的 NFT 專用的 API，感覺都不是很主流使用的？而且都有收費機制，看來看去只有 opensea-js 比較主流，其他都好少資訊，不知道能用不能用。然後把一些 erc721 合約有提供的功能看了一下，想像要怎麼串起來。
+
+最後選了一條比較麻煩的路線試試看，用 etherscan 的 API 取得 erc721 的交易紀錄，獲取使用者有交易過的合約跟 Token，再用 wagmi 打合約確認擁有者以及獲取 tokenURI，再根據 tokenURI 取得 metadata。
+
+然後是緩存的問題，因為 Tx 資料量可能會比較多，最後選擇用 indexedDB，然後可以使用 dexie 這個 library，操作 indexedDB 會方便許多。
+
+API 也需要緩存的機制，看起來比較主流的有 react-query 跟 react-SWR，看起來 react-query 比較完整，就選擇使用它了。
+
+一邊 Survey、一邊嘗試實做看看，基本思路是可以運作的，但要處理這麼多非同步請求所串起來的流程，在不熟悉 React Hooks 的情況下，好像會頗辛苦，有一種要開天窗的感覺。
+
+
+### Day 6 & Day 7
+
+第六天基本上就是想盡辦法用 React hooks 的思路把整個流程實踐出來，最不熟悉的就是 React Hooks 如何加上 一堆 asnyc function 並且是有相依跟連續性質的。因為休息了兩天，時間變得很趕，又有各種東西要熟悉，感覺是真的要開天窗惹。
+
+useNFT 這隻的流程：
+1. 通過 infiniteQuery 不斷獲取當前用戶的所有erc721交易記錄
+2. 從交易記錄中找出已經交易過的 Token 及其合約，將爬取到的區塊鏈號緩存起來。 同一用戶下次會繼續從這裡搜索
+3. 利用 wagmi 的 useContractReads 執行上面的合約，找出 owner 和 TokenURI，並以此過濾出擁有的 NFTs
+4. 根據上面獲取到的 TokenURI，使用 wagmi 的 useQueries 批次獲取 metadata。
+5. 將數據整理緩存到 indexedDB 中，並更新當前用戶擁有的 NFTs。
+
+第六天大致上寫到 step 3，第七天把 step 4 跟整個流程順一次。第七天一直遇到無限 re-render 的問題，最後參考了些資料，用 useMemo 跟 useCallback 處理掉了。用 useQueries 的時候又遇到一次，參考了[這篇](https://github.com/TanStack/query/issues/3049)的解決方法。最後快速簡單的把呈現介面做了一下，跟紀錄。
+
