@@ -21,13 +21,13 @@ This is our first DApp, Learning how to build a DApp by doing a small project th
 - API 都有透過 react-query 緩存
 
 沒做到的
-- 其他錢包沒測試
-- 其他鍊功能不齊全
-- 切換鍊之後，應該有很多 Bugs
-- 沒做分頁、錯誤處理、測試等
+- 主流程還沒順完跟容易遇到的情境處理也未做
+- 緩存的狀態管理、分頁、錯誤處理、測試等
+- 其他錢包跟鍊跟切換鍊的功能支援不齊全
 - 還沒接 erc1155
-- 進頁面會閃一下，還不知道如何處理
+- 進頁面會閃一下，還不知道原因
 - 更多的資訊還沒取得跟呈現
+
 
 核心的幾隻檔案
 - hooks/useNfts/useNft.ts // 取得NFTs 的主要核心
@@ -36,7 +36,9 @@ This is our first DApp, Learning how to build a DApp by doing a small project th
 - reducers/status.ts // 原本打算用它處理各式狀態變化，但還沒用上
 
 ## Week 1 小結
-感覺一口氣接觸太多不熟悉的東西，有點腦死，然後還生病。抓資料使用 opensea-js 會簡單很多，整個專案在第一週的目標完成度也會比較高。選擇下面這個流程來獲取使用者擁有的 NFTs，就目標達成來說，非常不好，但就學習上來說，真的是收穫滿滿。
+檢討一下，這週的成果離目標完成度差太遠，主要是執行策略的不好，在各種工具都不熟悉的情況下，硬是要選擇一種比較難的方案，導致最終的完成度不佳。應該要循序漸進地，將基本的事情做好，再來做會加分的東西，然後還生病，導致完成度跟[上一週](https://github.com/proxy0001/scatter-plots-on-maps)落差甚多。
+
+如果抓資料使用 opensea-js 或其他簡單的方案的話，整個專案在第一週的目標完成度也會比較高。選擇下面這個流程來獲取使用者擁有的 NFTs，就目標達成來說，非常不好，雖然就學習上來說是收穫滿滿。
 
 1. 通過 infiniteQuery 跟 etherscan AIP 獲取當前用戶的所有erc721交易記錄
 2. 從交易記錄中找出已經交易過的 Token 及其合約，將爬取到的區塊鏈號緩存起來。 同一用戶下次會繼續從這裡搜索
